@@ -1,0 +1,10 @@
+C:\Users\Tanusha\Documents\GitHub\Task1App\Task1App\bin\Debug\Task1App.exe.config
+C:\Users\Tanusha\Documents\GitHub\Task1App\Task1App\bin\Debug\Task1App.exe
+C:\Users\Tanusha\Documents\GitHub\Task1App\Task1App\bin\Debug\Task1App.pdb
+C:\Users\Tanusha\Documents\GitHub\Task1App\Task1App\obj\Debug\Task1App.csproj.CoreCompileInputs.cache
+C:\Users\Tanusha\Documents\GitHub\Task1App\Task1App\obj\Debug\Task1App.exe
+C:\Users\Tanusha\Documents\GitHub\Task1App\Task1App\obj\Debug\Task1App.pdb
+C:\Users\Tanusha\Documents\GitHub\Task1App\Task1App\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Tanusha\Documents\GitHub\Task1App\Task1App\bin\Debug\Newtonsoft.Json.xml
+C:\Users\Tanusha\Documents\GitHub\Task1App\Task1App\obj\Debug\Task1App.csproj.CopyComplete
+C:\Users\Tanusha\Documents\GitHub\Task1App\Task1App\obj\Debug\Task1App.csprojAssemblyReference.cache
