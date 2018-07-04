@@ -16,7 +16,7 @@ namespace Task1App.Classes
 
 		public override string ToString()
 		{
-			return $"TodoId:{Id} - Created:{CreatedAt.ToShortDateString()} - Name:{Name} - Completed:{IsComplete} - UserId:{UserId}\n";
+			return $"TodoId:{Id} - Created:{CreatedAt.ToShortDateString()} - Name:{Name}({Name.Length}) - Completed:{IsComplete} - UserId:{UserId}\n";
 		}
 	}
 }

@@ -203,9 +203,20 @@ namespace Task1App.Classes
 			try
 			{
 				var data = getDataDelegate.Invoke();
-				var result = data.Select(u => u).OrderBy(e => e.Name);
-				//SelectMany(u => u.Todos).OrderByDescending(t => t.Name.Length)
-
+				var subresult = data.Select(u => u).OrderBy(e => e.Name).ToList();
+				var result = subresult.GroupJoin(subresult.SelectMany(p => p.Todos)
+														  .OrderByDescending(t => t.Name.Length), 
+												 r => r.Id, t => t.UserId, 
+												 (u,j) => new SomeEntity{Id = u.Id,
+																		 Name =u.Name,
+																		 Avatar =u.Avatar,
+																		 CreatedAt =u.CreatedAt,
+																		 Email =u.Email,
+																		 MyAddress =u.MyAddress,
+																		 Posts =u.Posts,
+																		 Todos =j}
+												 );
+				
 				if (result == null || result.Count() <= 0)
 				{ Console.WriteLine("Result: 0"); return; }
 				foreach (var item in result)
