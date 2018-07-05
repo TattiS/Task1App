@@ -239,7 +239,7 @@ namespace Task1App.Classes
 			{
 				var data = getDataDelegate.Invoke();
 				result = data.Select(u => u).Where(u => u.Id == userId).SelectMany(t => t.Todos.Where(e => e.IsComplete == true)).Select(r => new Query3Result{ Id= r.Id, Name= r.Name });
-				if (result != null || result.Count() > 0)
+				if (result != null && result.Count() > 0)
 				{
 					foreach (var item in result)
 					{
@@ -279,7 +279,7 @@ namespace Task1App.Classes
 																		 Todos =j}
 												 );
 
-				if (result != null || result.Count() > 0)
+				if (result != null && result.Count() > 0)
 				{
 					foreach (var item in result)
 					{
