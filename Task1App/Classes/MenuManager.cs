@@ -33,24 +33,24 @@ namespace Task1App.Classes
 					case ConsoleKey.A:
 						Console.Clear();
 						userId = EnterUserId();
-						Query1(userId);
+						var result1 = Query1(userId);
 						Console.ReadKey();
 						break;
 					case ConsoleKey.B:
 						Console.Clear();
 						userId = EnterUserId();
-						Query2(userId);
+						var result2 = Query2(userId);
 						Console.ReadKey();
 						break;
 					case ConsoleKey.C:
 						Console.Clear();
 						userId = EnterUserId();
-						Query3(userId);
+						var result3 = Query3(userId);
 						Console.ReadKey();
 						break;
 					case ConsoleKey.D:
 						Console.Clear();
-						Query4();
+						var result4 = Query4();
 						Console.ReadKey();
 						break;
 					case ConsoleKey.E:
@@ -171,15 +171,17 @@ namespace Task1App.Classes
 		}
 		//Tasks
 		//Query1: Получить количество комментов под постами конкретного пользователя (по айди) (список из пост-количество)
-		private void Query1(int userId)
+		private IEnumerable<Query1Result> Query1(int userId)
 		{
+			IEnumerable<Query1Result> result = null;
+			
 			try
 			{
 				var data = getDataDelegate.Invoke();
 				var subresult = data.SelectMany(u => u.Posts.Where(p => p.UserId == userId));
 				if (subresult != null && subresult.Count() > 0)
 				{
-					var result = subresult.Select(p => new { PostItem = p, CommentCount = p.Comments.Count() });
+					result = subresult.Select(p => new Query1Result { PostItem = p, CommentCount = p.Comments.Count() });
 					foreach (var item in result)
 					{
 						Console.WriteLine($"Post: {item.PostItem} \n- Number of comments: {item.CommentCount}");
@@ -196,16 +198,17 @@ namespace Task1App.Classes
 				Console.WriteLine(ex.Message);
 				Console.ReadKey();
 			}
+			return result;
 		}
 		
 		//Query2:Получить список комментов под постами конкретного пользователя (по айди), где body коммента < 50 символов (список из комментов)
-		private void Query2(int userId)
+		private IEnumerable<Comment> Query2(int userId)
 		{
-
+			IEnumerable<Comment> result = null;
 			try
 			{
 				var data = getDataDelegate.Invoke();
-				var result = data.Select(u => u).Where(u => u.Id == userId).SelectMany(p => p.Posts).SelectMany(o => o.Comments.Where(i => i.Body.Length < 50));
+				result = data.Select(u => u).Where(u => u.Id == userId).SelectMany(p => p.Posts).SelectMany(o => o.Comments.Where(i => i.Body.Length < 50));
 				if (result != null && result.Count() > 0)
 				{
 					foreach (var item in result)
@@ -215,7 +218,7 @@ namespace Task1App.Classes
 				}
 				else
 				{
-					Console.WriteLine("Result: 0"); return;
+					Console.WriteLine("Result: 0"); 
 				}
 			}
 			catch (Exception ex)
@@ -225,22 +228,26 @@ namespace Task1App.Classes
 				Console.ReadKey();
 			}
 
-
+			return result;
 		}
 		
 		//Query3:Получить список (id, name) из списка todos которые выполнены для конкретного пользователя (по айди)
-		private void Query3(int userId)
+		private IEnumerable<Query3Result> Query3(int userId)
 		{
+			IEnumerable<Query3Result> result = null;
 			try
 			{
 				var data = getDataDelegate.Invoke();
-				var result = data.Select(u => u).Where(u => u.Id == userId).SelectMany(t => t.Todos.Where(e => e.IsComplete == true)).Select(r => new { r.Id, r.Name });
-				if (result == null || result.Count() <= 0)
-				{ Console.WriteLine("Result: 0"); return; }
-				foreach (var item in result)
+				result = data.Select(u => u).Where(u => u.Id == userId).SelectMany(t => t.Todos.Where(e => e.IsComplete == true)).Select(r => new Query3Result{ Id= r.Id, Name= r.Name });
+				if (result != null || result.Count() > 0)
 				{
-					Console.WriteLine($"Id: {item.Id}  Name: {item.Name}\n");
+					foreach (var item in result)
+					{
+						Console.WriteLine($"Id: {item.Id}  Name: {item.Name}\n");
+					}
 				}
+				else
+				{ Console.WriteLine("Result: 0"); }
 			}
 			catch (Exception ex)
 			{
@@ -248,16 +255,18 @@ namespace Task1App.Classes
 				Console.WriteLine(ex.Message);
 				Console.ReadKey();
 			}
+			return result;
 		}
 		
 		//Query4:Получить список пользователей по алфавиту (по возрастанию) с отсортированными todo items по длине name (по убыванию)
-		private void Query4()
+		private IEnumerable<SomeEntity> Query4()
 		{
+			IEnumerable<SomeEntity> result = null;
 			try
 			{
 				var data = getDataDelegate.Invoke();
 				var subresult = data.Select(u => u).OrderBy(e => e.Name).ToList();
-				var result = subresult.GroupJoin(subresult.SelectMany(p => p.Todos)
+				result = subresult.GroupJoin(subresult.SelectMany(p => p.Todos)
 														  .OrderByDescending(t => t.Name.Length), 
 												 r => r.Id, t => t.UserId, 
 												 (u,j) => new SomeEntity{Id = u.Id,
@@ -269,14 +278,16 @@ namespace Task1App.Classes
 																		 Posts =u.Posts,
 																		 Todos =j}
 												 );
-				
-				if (result == null || result.Count() <= 0)
-				{ Console.WriteLine("Result: 0"); return; }
 
-				foreach (var item in result)
+				if (result != null || result.Count() > 0)
 				{
-					Console.WriteLine(item);
+					foreach (var item in result)
+					{
+						Console.WriteLine(item);
+					}
 				}
+				else
+				{ Console.WriteLine("Result: 0"); }
 			}
 			catch (Exception ex)
 			{
@@ -284,6 +295,7 @@ namespace Task1App.Classes
 				Console.WriteLine(ex.Message);
 				Console.ReadKey();
 			}
+			return result;
 		}
 		
 		//Query5:Получить следующую структуру (передать Id пользователя в параметры)
