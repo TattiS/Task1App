@@ -50,6 +50,8 @@
     <Compile Include="Classes\MenuManager.cs" />
     <Compile Include="Classes\Post.cs" />
     <Compile Include="Classes\PostStruct.cs" />
+    <Compile Include="Classes\Query1Result.cs" />
+    <Compile Include="Classes\Query3Result.cs" />
     <Compile Include="Classes\Todo.cs" />
     <Compile Include="Classes\SomeEntity.cs" />
     <Compile Include="Classes\User.cs" />
