@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Task1App.Classes
 {
-	class Comment:IComparable
+	class Comment:IEquatable<Comment>
 	{
 		public int Id { get; set; }
 		public DateTime CreatedAt { get; set; }
@@ -15,9 +15,21 @@ namespace Task1App.Classes
 		public int PostId { get; set; }
 		public int Likes { get; set; }
 
-		public int CompareTo(object obj)
+		public bool Equals(Comment other)
 		{
-			return Id.CompareTo(obj);
+			if (Object.ReferenceEquals(other, null)) return false;
+
+			if (Object.ReferenceEquals(this, other)) return true;
+
+			return Id.Equals(other.Id) && CreatedAt.Equals(other.CreatedAt);
+		}
+
+		public override int GetHashCode()
+		{
+			int hashId = Id.GetHashCode();
+			int hashBody = Body == null ? 0 : Body.GetHashCode();
+			int hashUser = UserId.GetHashCode();
+			return hashBody ^ hashId * hashUser;
 		}
 
 		public override string ToString()
