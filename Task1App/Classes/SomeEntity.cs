@@ -16,6 +16,7 @@ namespace Task1App.Classes
 		public IEnumerable<FullPost> Posts { get; set; }
 		public IEnumerable<Todo> Todos { get; set; }
 		public Address MyAddress { get; set; }
+		public IEnumerable<Comment> Comments { get; internal set; }
 
 		public override string ToString()
 		{
@@ -33,6 +34,15 @@ namespace Task1App.Classes
 			{
 				result += "\tPosts list:\n";
 				foreach (var item in Posts)
+				{
+					result += item.ToString();
+				}
+				result += "\n";
+			}
+			if (Comments != null && Comments.Count() > 0)
+			{
+				result += "\tComments list:\n";
+				foreach (var item in Comments)
 				{
 					result += item.ToString();
 				}
