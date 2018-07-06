@@ -216,26 +216,22 @@ namespace Task1App.Service
 			try
 			{
 				SomeEntity usr = GetEntities().Where(u => u.Id == userId).FirstOrDefault();
-				List<FullPost> posts = usr.Posts.ToList();
+				List<FullPost> posts = usr?.Posts.ToList();
 
-				if (posts != null && posts.Count() > 0)
-				{
-					user.LastPost = posts.OrderByDescending(p => p.CreatedAt).FirstOrDefault();
+				user.LastPost = posts?.OrderByDescending(p => p.CreatedAt).FirstOrDefault();
 
-					user.LastPostCommentsCount = posts.OrderByDescending(p => p.CreatedAt).First().Comments.Count();
+				user.LastPostCommentsCount = posts?.OrderByDescending(p => p.CreatedAt).FirstOrDefault()?.Comments.Count() ?? 0;
 
-					var res = posts.Where(p => p.Comments.Count() > 0)
+				user.MostPopularByComms = posts?.Where(p => p.Comments.Count() > 0)
 									.Select(a => new { CurrentPost = a, CommentsCount = a.Comments.Where(c => c.Body.Length > 80).Count() })
 									.OrderByDescending(i => i.CommentsCount)
 									.Where(i => i.CommentsCount > 0)
-									.FirstOrDefault();
-					if(res != null)
-					user.MostPopularByComms = res.CurrentPost;
+									.FirstOrDefault()?.CurrentPost;
+					
+				user.MostPopularByLikes = posts?.OrderByDescending(p => p.Likes).FirstOrDefault();
 
-					user.MostPopularByLikes = posts.OrderByDescending(p => p.Likes).FirstOrDefault();
-
-					user.UnCompletedTasksCount = usr.Todos.Where(t => t.IsComplete == false).Count();
-				}
+				user.UnCompletedTasksCount = usr.Todos.Where(t => t.IsComplete == false).Count();
+				
 			}
 			catch (Exception ex)
 			{
