@@ -26,8 +26,8 @@ namespace Task1App.Classes
 				Console.WriteLine(greeting);
 				Console.WriteLine(menuItems);
 				ConsoleKey pressedKey = Console.ReadKey().Key;
-				//var data = getDataDelegate.Invoke
 				int userId;
+				int postId;
 				switch (pressedKey)
 				{
 					case ConsoleKey.A:
@@ -64,15 +64,62 @@ namespace Task1App.Classes
 						return;
 					case ConsoleKey.F:
 						Console.Clear();
-						var postId = EnterPostId();
+						postId = EnterPostId();
 						var p = Query6(postId);
 						Show(p);
+						Console.ReadKey();
+						break;
+					case ConsoleKey.J:
+						Console.Clear();
+						Show(getDataDelegate.Invoke());
+						Console.ReadKey();
+						break;
+					case ConsoleKey.K:
+						Console.Clear();
+						userId = EnterUserId();
+						Show(getDataDelegate.Invoke().Where(o=>o.Id == userId).First());
+						Console.ReadKey();
+						break;
+					case ConsoleKey.L:
+						Console.Clear();
+						postId = EnterPostId();
+						Show(getDataDelegate.Invoke().SelectMany(k=>k.Posts).Where(o => o.Id == postId).First());
 						Console.ReadKey();
 						break;
 				}
 			} while (true);
 		}
 
+		private void Show(FullPost fullPost)
+		{
+			if (fullPost != null)
+			{
+				Console.WriteLine(fullPost);
+				if (fullPost.Comments != null && fullPost.Comments.Count() > 0)
+				{
+					Console.WriteLine("\tList of comments:");
+					foreach (var item in fullPost.Comments)
+					{
+						Console.WriteLine(item);
+					}
+				}
+			}
+			else
+			{
+				Console.WriteLine("Result: 0");
+			}
+		}
+		private void Show(SomeEntity someEntity)
+		{
+			if (someEntity != null)
+			{
+				Console.WriteLine(someEntity);
+			}
+			else
+			{
+				Console.WriteLine("Result: 0");
+			}
+		}
 		private void Show(PostStruct post)
 		{
 			Console.Write("The longest comment: ");
@@ -90,7 +137,6 @@ namespace Task1App.Classes
 			Console.WriteLine($"The number of low-rated comments: {post.LowRatedCommsCount}");
 			
 		}
-
 		private void Show(UserStruct user)
 		{
 			Console.Write("The latest post: ");
@@ -116,7 +162,28 @@ namespace Task1App.Classes
 			Console.WriteLine($"The number of uncompleted tasks: {user.UnCompletedTasksCount}");
 			
 		}
-
+		private void Show(IEnumerable <SomeEntity> users)
+		{
+			if (users != null && users.Count() > 0)
+			{
+				foreach (var item in users)
+				{
+					Console.WriteLine(item);
+				}
+			}
+			else
+			{ Console.WriteLine("Result: 0"); }
+		}
+		private void Show(Query3Result instance)
+		{
+			if (instance != null)
+			{				
+				Console.WriteLine($"Id: {instance.Id} - Name: {instance.Name}");
+			}
+			else
+			{ Console.WriteLine("Result: 0"); }
+		}
+		
 		private int EnterUserId()
 		{
 			int id = -1;
@@ -128,7 +195,7 @@ namespace Task1App.Classes
 
 				if (Int32.TryParse(resultString, out id) && id > 0)
 				{
-					var isExist = getDataDelegate.Invoke().Select(u => u).Where(i => i.Id == id);
+					var isExist = getDataDelegate.Invoke().Where(i => i.Id == id);
 					if (isExist != null && isExist.Count() > 0)
 					{
 						break;
@@ -169,6 +236,7 @@ namespace Task1App.Classes
 			} while (true);
 			return id;
 		}
+		
 		//Tasks
 		//Query1: Получить количество комментов под постами конкретного пользователя (по айди) (список из пост-количество)
 		private IEnumerable<Query1Result> Query1(int userId)
@@ -182,6 +250,7 @@ namespace Task1App.Classes
 				if (subresult != null && subresult.Count() > 0)
 				{
 					result = subresult.Select(p => new Query1Result { PostItem = p, CommentCount = p.Comments.Count() });
+
 					foreach (var item in result)
 					{
 						Console.WriteLine($"Post: {item.PostItem} \n- Number of comments: {item.CommentCount}");
@@ -208,7 +277,8 @@ namespace Task1App.Classes
 			try
 			{
 				var data = getDataDelegate.Invoke();
-				result = data.Select(u => u).Where(u => u.Id == userId).SelectMany(p => p.Posts).SelectMany(o => o.Comments.Where(i => i.Body.Length < 50));
+				result = data.Where(u => u.Id == userId).SelectMany(p => p.Posts).SelectMany(o => o.Comments.Where(i => i.Body.Length < 50));
+
 				if (result != null && result.Count() > 0)
 				{
 					foreach (var item in result)
@@ -238,7 +308,8 @@ namespace Task1App.Classes
 			try
 			{
 				var data = getDataDelegate.Invoke();
-				result = data.Select(u => u).Where(u => u.Id == userId).SelectMany(t => t.Todos.Where(e => e.IsComplete == true)).Select(r => new Query3Result{ Id= r.Id, Name= r.Name });
+				result = data.Where(u => u.Id == userId).SelectMany(t => t.Todos.Where(e => e.IsComplete == true)).Select(r => new Query3Result{ Id= r.Id, Name= r.Name });
+
 				if (result != null && result.Count() > 0)
 				{
 					foreach (var item in result)
@@ -265,7 +336,7 @@ namespace Task1App.Classes
 			try
 			{
 				var data = getDataDelegate.Invoke();
-				var subresult = data.Select(u => u).OrderBy(e => e.Name).ToList();
+				var subresult = data.OrderBy(e => e.Name).ToList();
 				result = subresult.GroupJoin(subresult.SelectMany(p => p.Todos)
 														  .OrderByDescending(t => t.Name.Length), 
 												 r => r.Id, t => t.UserId, 
@@ -311,15 +382,16 @@ namespace Task1App.Classes
 			try
 			{
 				var data = getDataDelegate.Invoke();
-				SomeEntity usr = data.Select(u => u)
-							  .Where(u => u.Id == userId).FirstOrDefault();
+				SomeEntity usr = data.Where(u => u.Id == userId).FirstOrDefault();
 				List<FullPost> posts = usr.Posts.ToList();
+
 				if (posts != null && posts.Count()>0)
 				{
 					FullPost lastPost = posts.OrderByDescending(p => p.CreatedAt).First();
 					if (lastPost != null)
 					{
 						user.LastPost = lastPost;
+
 						if (lastPost.Comments != null)
 						{
 							user.LastPostCommentsCount = lastPost.Comments.Count();
@@ -327,8 +399,7 @@ namespace Task1App.Classes
 					}
 
 					List<FullPost> subresult = posts.OrderByDescending(p => p.Comments.Count())
-														.Select(p=>p)
-														.Where(c=>c.Comments.Select(p=>p).Where(e => e.Body.Length > 80).Count()>0)
+														.Where(c => c.Comments.Where(e => e.Body.Length > 80).Count() > 0)
 														.ToList();
 
 					if (subresult != null && subresult.Count() > 0)
@@ -346,7 +417,9 @@ namespace Task1App.Classes
 																	  ).OrderBy(v => v.CommsCounts)
 																	  .Last().PostItem;
 					}
-					
+
+
+
 					user.MostPopularByLikes = posts.OrderByDescending(p => p.Likes).First();
 				}
 				if (usr.Todos != null)
@@ -379,20 +452,22 @@ namespace Task1App.Classes
 				FullPost currentPost = data.SelectMany(u => u.Posts)
 											 .Where(u => u.Id == postId)
 											 .FirstOrDefault();
-				postStruct.LongestComm = currentPost.Comments.Select(c => c)
+				postStruct.LongestComm = currentPost.Comments
 													.OrderBy(c => c.Body.Length)
 													.LastOrDefault();
-				postStruct.LikestComm = currentPost.Comments.Select(c => c)
+				postStruct.LikestComm = currentPost.Comments
 												   .OrderBy(c => c.Likes)
 												   .LastOrDefault();
-				List<Comment> subresult = currentPost.Comments.Select(c => c)
-										   .Where(p => p.Likes == 0 || p.Body.Length < 80).Distinct().ToList();
+				List<Comment> subresult = currentPost.Comments
+										   .Where(p => p.Likes == 0 || p.Body.Length < 80).ToList();
+
 				Console.WriteLine($"Current: {currentPost} \nAll comments: ");
+
 				foreach (var item in currentPost.Comments)
 				{
 					Console.WriteLine(item);
 				}
-				Console.WriteLine("Selected comments");
+				Console.WriteLine("\nSelected comments");
 				foreach (var item in subresult)
 				{
 					Console.WriteLine(item);
